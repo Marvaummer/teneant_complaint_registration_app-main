@@ -17,6 +17,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.5),
       body: Stack(
         children: [
           // Background image
