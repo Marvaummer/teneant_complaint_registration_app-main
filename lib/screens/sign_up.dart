@@ -9,6 +9,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,38 +56,102 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  const Text(
-                    'Title',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, // White text for contrast
+
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Container(
+                      padding: EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8), // Similar to the fill color in InputDecoration
+                        borderRadius: BorderRadius.circular(15), // Optional: Add border radius
+                       // border: Border.all(color: Colors.grey), // Optional: Add border color
+                      ),
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          hintText: 'Title',
+                          hintStyle: const TextStyle(color: Color(0xFFF27272a),),
+                          prefixIcon: Icon(Icons.female_outlined, color: Color(0xFFF27272a),),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide.none, // Remove the default border
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide.none, // Remove the focused border
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'Mr.', child: Text('Mr.')),
+                          DropdownMenuItem(value: 'Ms.', child: Text('Ms.')),
+                          DropdownMenuItem(value: 'Mrs.', child: Text('Mrs.')),
+                        ],
+                        onChanged: (value) {
+                          // Implement your logic here
+                        },
+                      ),
                     ),
                   ),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.8),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'Mr.', child: Text('Mr.')),
-                      DropdownMenuItem(value: 'Ms.', child: Text('Ms.')),
-                      DropdownMenuItem(value: 'Mrs.', child: Text('Mrs.')),
-                    ],
-                    onChanged: (value) {}, // Implement your logic here
+
+
+                  _buildTextField(
+              label: "Full Name",
+              icon: Icons.person,
+              obscureText: false,
+            ),
+                  _buildTextField(
+                    label: "Phone Number",
+                    icon: Icons.phone,
+                    obscureText: false,
                   ),
-                  const SizedBox(height: 20.0),
-                  _buildTextField('Full Name'),
-                  const SizedBox(height: 20.0),
-                  _buildTextField('Phone Number', TextInputType.phone),
-                  const SizedBox(height: 20.0),
-                  _buildTextField('Email', TextInputType.emailAddress),
-                  const SizedBox(height: 20.0),
-                  _buildTextField('Contract Number'),
-                  const SizedBox(height: 20.0),
-                  _buildTextField('Password', TextInputType.text, true),
-                  const SizedBox(height: 20.0),
-                  _buildTextField('Confirm Password', TextInputType.text, true),
-                  const SizedBox(height: 50.0),
+
+                  _buildTextField(
+                    label: "Email",
+                    icon: Icons.email,
+                    obscureText: false,
+                  ),
+
+                  _buildTextField(
+                    label: "Contact Number",
+                    icon: Icons.phone_android,
+                    obscureText: false,
+                  ),
+
+             _buildTextField(
+              label: "Password",
+              icon: Icons.lock,
+              obscureText: _obscureText,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureText
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                  color: const Color(0xFFF27272a),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              ),
+            ),
+                  _buildTextField(
+                    label: "Confirm Password",
+                    icon: Icons.lock,
+                    obscureText: _obscureText,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: const Color(0xFFF27272a),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20,),
                   Center(
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context).push(
@@ -136,7 +201,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                   ),
-                ],
+           ],
               ),
             ),
           ),
@@ -144,16 +209,35 @@ class _SignUpState extends State<SignUp> {
       ),
     );
   }
-
-  Widget _buildTextField(String labelText, [TextInputType keyboardType = TextInputType.text, bool obscureText = false]) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: labelText,
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.8), // Light background for text fields
+  Widget _buildTextField({
+    required String label,
+    required IconData icon,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(14.0),
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: TextFormField(
+          obscureText: obscureText,
+          style: const TextStyle(color: Color(0xFFF27272a),),
+          decoration: InputDecoration(
+            hintText: label,
+            hintStyle: const TextStyle(color: Color(0xFFF27272a),),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Icon(icon, color: Color(0xFFF27272a),),
+            ),
+            suffixIcon: suffixIcon,
+            border: InputBorder.none,
+          ),
+        ),
       ),
-      keyboardType: keyboardType,
-      obscureText: obscureText,
     );
   }
 }

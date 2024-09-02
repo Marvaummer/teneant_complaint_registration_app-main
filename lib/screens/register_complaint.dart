@@ -105,6 +105,7 @@ class _RegisterComplaintState extends State<RegisterComplaint> {
                     _buildTextField("Name", Icons.label),
                     _buildTextField("Phone number", Icons.phone),
                     _buildTextField("Location", Icons.location_city),
+                    _buildunitNumber('Unit Number', Icons.numbers),
                     const SizedBox(height: 16),
                     _buildDropdown(
                       hint: 'Select a Category',
@@ -201,9 +202,42 @@ class _RegisterComplaintState extends State<RegisterComplaint> {
                   border: InputBorder.none,
                 ),
                 enabled: false,
+                validator: (value) {
+                  if (controller.text.isEmpty) {
+                    return 'Please select $hintText';
+                  }
+                  return null;
+                },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildunitNumber(String hintText, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: TextFormField(
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Colors.black),
+            prefixIcon: Icon(icon, color: Colors.red),
+            border: InputBorder.none,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter $hintText';
+            }
+            return null;
+          },
         ),
       ),
     );
@@ -226,7 +260,11 @@ class _RegisterComplaintState extends State<RegisterComplaint> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           value: value,
-          hint: Text(hint),
+          hint: Text(hint, style: const TextStyle(color: Colors.black)),
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+          ),
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.red),
           items: items.map((String item) {
             return DropdownMenuItem<String>(
               value: item,
@@ -234,9 +272,12 @@ class _RegisterComplaintState extends State<RegisterComplaint> {
             );
           }).toList(),
           onChanged: onChanged,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-          ),
+          validator: (value) {
+            if (value == null) {
+              return 'Please select $hint';
+            }
+            return null;
+          },
         ),
       ),
     );
@@ -249,130 +290,115 @@ class _RegisterComplaintState extends State<RegisterComplaint> {
         color: Colors.grey[300],
         borderRadius: BorderRadius.circular(15),
       ),
-      child: TextFormField(
-        controller: _descriptionController,
-        maxLines: 5,
-        maxLength: 500,
-        decoration: const InputDecoration(
-          hintText: 'Request Details',
-          hintStyle: TextStyle(color: Colors.black),
-          border: InputBorder.none,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: TextFormField(
+          controller: _descriptionController,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            hintText: 'Description',
+            border: InputBorder.none,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a description';
+            }
+            return null;
+          },
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter a description';
-          }
-          return null;
-        },
       ),
     );
   }
 
   Widget _buildImageSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_imageFile != null)
-          Container(
-            width: 300,
-            height: 200,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              image: DecorationImage(
-                image: FileImage(_imageFile!),
-                fit: BoxFit.cover,
+        const Text('Upload Image'),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              ElevatedButton.icon(
+                onPressed: () => _pickImage(ImageSource.gallery),
+                icon: const Icon(Icons.photo_library),
+                label: const Text('Pick from Gallery'),
               ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-          )
-        else
-          Container(
-            width: 320,
-            height: 150,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.image,
-              size: 80,
-              color: Colors.white70,
-            ),
+              const SizedBox(width: 16),
+              ElevatedButton.icon(
+                onPressed: () => _pickImage(ImageSource.camera),
+                icon: const Icon(Icons.camera_alt),
+                label: const Text('Capture with Camera'),
+              ),
+            ],
           ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              onPressed: () => _pickImage(ImageSource.camera),
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Take a Photo'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.greenAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            const SizedBox(width: 20),
-            ElevatedButton.icon(
-              onPressed: () => _pickImage(ImageSource.gallery),
-              icon: const Icon(Icons.photo_library),
-              label: const Text('Gallery'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.greenAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ],
         ),
+        const SizedBox(height: 16),
+        if (_imageFile != null)
+          Image.file(
+            _imageFile!,
+            width: 100,
+            height: 100,
+            fit: BoxFit.cover,
+          ),
+        if (_imageFile == null)
+          const Text('No image selected.', style: TextStyle(color: Colors.red)),
       ],
     );
   }
 
-
   Widget _buildActionButtons() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         ElevatedButton(
           onPressed: () {
-            if (_formKey.currentState?.validate() ?? false) {
-              // Handle form submission logic here
+            if (_formKey.currentState!.validate() && _imageFile != null) {
+              // Perform form submission
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Form submitted successfully!')),
+              );
+            } else if (_imageFile == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text(' upload an image')),
+              );
             }
           },
-          child: const Text('Submit'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Text('Submit',style: TextStyle(fontWeight: FontWeight.bold),),
           ),
         ),
-        ElevatedButton(
+        OutlinedButton(
           onPressed: () {
-            Navigator.pop(context);
+            // Clear form fields
+            _formKey.currentState!.reset();
+            _descriptionController.clear();
+            _fromDateController.clear();
+            _toDateController.clear();
+            setState(() {
+              _selectedCategory = null;
+              _selectedSubCategory = null;
+              _imageFile = null;
+            });
           },
-          child: const Text('Cancel'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            side: const BorderSide(color: Colors.red),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Text('Reset'),
           ),
         ),
       ],
